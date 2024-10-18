@@ -1,0 +1,331 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 20;
+            margin: 0;
+            background: url('kuromi1.gif') center center/cover no-repeat fixed;
+            overflow-x: hidden;
+        }
+
+        /* Capa de degradado morado sobre el fondo GIF */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom right, rgba(155, 89, 182, 0.7), rgba(155, 89, 182, 0.7));
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        /* Título */
+        h1 {
+            font-weight: bold;
+            font-size: 36px;
+            color: white;
+            background-color: black;
+            padding: 10px;
+            margin: 20px 0;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #9b59b6;
+            color: white;
+            padding: 15px 32px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Brillitos animados en el botón */
+        button::before {
+            content: '';
+            position: absolute;
+            top: -150%;
+            left: -150%;
+            width: 400%;
+            height: 400%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 70%);
+            animation: sparkle 2s infinite ease-in-out;
+            opacity: 0.5;
+        }
+
+        /* Animación de brillitos */
+        @keyframes sparkle {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            50% {
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        img {
+            max-width: 50%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .info-box {
+            background-color: white;
+            color: black;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 18px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos del modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 3;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .modal .progress {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .modal .copy-password {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-password input {
+            margin-right: 10px;
+            padding: 5px;
+        }
+
+        .copy-password button {
+            padding: 5px;
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .copy-password button:hover {
+            background-color: #8e44ad;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Capa de degradado sobre el GIF -->
+    <div class="overlay"></div>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <!-- Título -->
+        <h1>Invitación a un lugar</h1>
+
+        <!-- Imagen antes del botón -->
+        <img src="kuromi.png" alt="Kuromi" />
+
+        <!-- Cuadro con el mensaje -->
+        <div class="info-box">
+            Si lees esto es porque lograste escanear el QR de manera correcta, pero aún falta un paso más jejeje
+        </div>
+
+        <!-- Botón para desbloquear el otro botón -->
+        <div class="button-container">
+            <button onclick="showModal()">Pulsame</button>
+        </div>
+
+        <!-- Botón bloqueado inicialmente -->
+        <div class="button-container">
+            <button id="misteryButton" disabled>
+                Botón misterioso
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para las preguntas -->
+    <div id="questionModal" class="modal">
+        <div class="modal-content">
+            <div id="questionText"></div>
+            <button id="nextButton" onclick="nextQuestion()" disabled>Siguiente</button>
+            <div class="progress" id="progressText">Pregunta 0/4</div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "¿Me amas mucho?",
+                answers: ["Si", "Si"]
+            },
+            {
+                question: "¿Verdad que soy el mejor?",
+                answers: ["Si", "Si"]
+            },
+            {
+                question: "¿Quién es mi princesa?",
+                answers: ["Yo", "Obvio que yo maldito perro"]
+            },
+            {
+                question: "¿Quieres saber qué hay en el botón misterioso?",
+                answers: ["Si", "Si"]
+            },
+            {
+                question: "La contraseña es:",
+                answers: ["AmoAmiChico12"]
+            }
+        ];
+
+        let currentQuestion = 0;
+
+        function showModal() {
+            document.getElementById("questionModal").style.display = "block";
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const questionContainer = document.getElementById("questionText");
+            const progressText = document.getElementById("progressText");
+
+            if (currentQuestion < 4) {
+                let checkboxes = questions[currentQuestion].answers
+                    .map(answer => `<label><input type="checkbox" onclick="enableNextButton()">${answer}</label>`)
+                    .join("");
+                questionContainer.innerHTML = `
+                    <h2>${questions[currentQuestion].question}</h2>
+                    <div>${checkboxes}</div>
+                `;
+                document.getElementById("nextButton").disabled = true; // Deshabilita el botón "Siguiente"
+                progressText.innerText = `Pregunta ${currentQuestion + 1}/4`;
+            } else if (currentQuestion === 4) {
+                questionContainer.innerHTML = `
+                    <h2>MI bebé me ama mucho y no forzé ninguna respuesta, ¡yupiii!</h2>
+                    <div>La contraseña es: <span id="password">AmoAmiChico12</span></div>
+                    <div class="copy-password">
+                        <input type="text" value="AmoAmiChico12" id="passwordField" readonly>
+                        <button onclick="copyPassword()">Copiar</button>
+                    </div>
+                `;
+                progressText.innerText = `Pregunta 5/5`;
+                document.getElementById("nextButton").disabled = false; // Permite el siguiente paso en la última pregunta
+            }
+        }
+
+        function enableNextButton() {
+            // Si alguna opción está seleccionada, habilita el botón "Siguiente"
+            document.getElementById("nextButton").disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < 4) {
+                currentQuestion++;
+                loadQuestion();
+            } else {
+                closeModal();
+                unlockMisteryButton();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById("questionModal").style.display = "none";
+        }
+
+        function unlockMisteryButton() {
+            const misteryButton = document.getElementById("misteryButton");
+            misteryButton.disabled = false;
+
+            misteryButton.innerHTML = `
+                <button onclick="checkPassword()">Botón misterioso</button>
+            `;
+        }
+
+        function checkPassword() {
+            const userPassword = prompt("Hola guapa, ingresa la contraseña que te puse:❤️");
+            if (userPassword === "AmoAmiChico12") {
+                window.location.href = "flores.html";
+            } else {
+                alert("Contraseña incorrecta. Intenta de nuevo.");
+            }
+        }
+
+        function copyPassword() {
+            const passwordField = document.getElementById("passwordField");
+            passwordField.select();
+            document.execCommand("copy");
+            alert("Contraseña copiada: " + passwordField.value);
+        }
+    </script>
+
+</body>
+
+</html>
